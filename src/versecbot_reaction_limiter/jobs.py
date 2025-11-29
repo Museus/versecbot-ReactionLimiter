@@ -1,4 +1,5 @@
 from collections import defaultdict
+from hashlib import sha256
 from logging import getLogger
 
 from discord import Client, Member
@@ -24,12 +25,17 @@ class ReactionGate(ReactionWatcher):
             self.client.get_channel(channel_id) for channel_id in settings.channel_ids
         ]
         self.roles_required = settings.roles_required
+        guild = self.client.get_guild(self.channels[0].guild.id)
+        self.role_names = list(
+            {guild.get_role(role_id).name for role_id in self.roles_required}
+        )
         self.data = defaultdict(dict)
-        self.name = "watcher_reaction_gate"
+
+        self.name = f"watcher_reaction_gate_{self.generate_name_suffix()}"
 
     def initialize(self, settings: ReactionLimiterSettings, *args):
         """Nothing special to do here."""
-        logger.debug("Initializing...")
+        logger.debug("Initializing %s...", self.name)
         super().initialize(settings, *args)
 
     def user_has_any_roles(self, user: Member, role_ids: list[str]) -> bool:
@@ -61,3 +67,10 @@ class ReactionGate(ReactionWatcher):
         )
 
         await reaction.message.remove_reaction(reaction.emoji, user)
+
+    def generate_name_suffix(self) -> str:
+        gate_key = "&".join(
+            [f"{cid}{role}" for cid in self.channel_ids for role in self.roles_required]
+        )
+
+        return sha256(gate_key.encode()).hexdigest()[:8]

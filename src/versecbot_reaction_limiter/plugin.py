@@ -36,8 +36,9 @@ class ReactionLimiterPlugin(Plugin):
             else:
                 self.assign_job(gate)
                 logger.info(
-                    "Limiting reactions in channels %s",
+                    "Limiting reactions in channels %s to %s",
                     ", ".join(channel.name for channel in gate.channels),
+                    ", ".join(gate.role_names),
                 )
 
         logger.info("Reaction Limiter initialized")

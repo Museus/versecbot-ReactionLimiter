@@ -4,7 +4,7 @@
 
 [project]
     name = "versecbot_reaction_limiter"
-    version = "0.1.1"
+    version = "0.2.0"
     authors = [{ name = "Museus", email = "versecbot@museus.dev" }]
     description = "VerSecBot plugin to restrict reactions based on user roles."
     readme = "README.md"
